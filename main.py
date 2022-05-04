@@ -12,15 +12,14 @@ import xlrd
 window = tk.Tk()
 window.title("MySQL Table Modifier")
 window.geometry("600x680")
-window.columnconfigure(10, weight=3)
+
 def getInput():
     inp_db = input_db.get(1.0, "end-1c")
-    print(inp_db)
     return inp_db
 
 def Choosing_Database():
     # code
-    global engine, user, password, host, port, database
+    global engine, user, password, host, port, database, r_set
     user = 'root'
     password = 'qwerty1234'
     host = 'localhost'
@@ -31,6 +30,7 @@ def Choosing_Database():
 
         engine = create_engine("mysql://{0}:{1}@{2}:{3}/{4}".format(user, password, host, port, database))  # after//= user:password@localhost(or ip address)/database name
         #lbl.config(text=f"Database: connection to the '{host}' for user '{user}' created successfully")
+        r_set = engine.execute("SHOW TABLES")
         Session = sessionmaker(bind=engine)
         create_table_list()
         print(f"connection to the {host} for user {user} created successfully")
@@ -44,23 +44,34 @@ def Choosing_Database():
         # input_tbl = tk.Text(window, height=1, width=20)
         # input_tbl.pack()
 def create_table_list():
-    inspector = inspect(engine)
-    tables = inspector.get_table_names()
-    total_rows = len(tables)
-    total_colums = len(tables) - 1
-    list_tbl = Label(window, text=f"Tables in {database}", width=20, borderwidth=2, relief="ridge", anchor='w',
-                     bg='green')
-    list_tbl.grid(row=6, column=0)
-    for i in range(total_rows):
-        for j in range(total_colums):
-            print(j)
-            list_tbl = Label(window, text=tables[i], width=20, borderwidth=2, relief="ridge", anchor='w')
-            list_tbl.grid(row=i + 7, column=j)
+    i = 0
+    for data in r_set:
+        for j in range(len(data)):
+            list_tables = Label(window, text=data[j], width=20, borderwidth=2, relief="ridge", anchor='w')
+            list_tables.grid(row=i + 7, column=j)
             checkDB = Button(window, text="Update", command=Choosing_Table)
-            checkDB.grid(row=i + 7, column=1)
+            checkDB.grid(row=i + 7, column=j+1)
+        i = i + 1
+    # inspector = inspect(engine)
+    # tables = inspector.get_table_names()
+    # total_rows = len(tables)
+    # total_colums = len(tables) - 1
+    # list_tbl = Label(window, text=f"Tables in {database}", width=20, borderwidth=2, relief="ridge", anchor='w',
+    #                  bg='green')
+    # list_tbl.grid(row=6, column=0)
+    # for dt in tables:
+    #     print(dt)
+    # for i in range(total_rows):
+    #     for j in range(total_colums):
+    #         print(j)
+    #         list_tbl = Label(window, text=tables[i], width=20, borderwidth=2, relief="ridge", anchor='w')
+    #         list_tbl.grid(row=i + 7, column=j)
+    #         checkDB = Button(window, text="Update", command=Choosing_Table)
+    #         checkDB.grid(row=i + 7, column=1)
         # list_tbl.insert(END, tables[i])
 def Choosing_Table():
     # code
+
     print()
 
 input_lbl_db = Label(window, text="Database: ")
