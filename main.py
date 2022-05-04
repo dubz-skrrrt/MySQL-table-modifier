@@ -14,7 +14,7 @@ window.title("MySQL Table Modifier")
 window.geometry("600x680")
 
 def getInput():
-    inp_db = input_db.get(1.0, "end-1c")
+    inp_db = input_db.get()
     return inp_db
 
 def Choosing_Database():
@@ -27,7 +27,7 @@ def Choosing_Database():
     database = getInput()
 
     try:
-
+        input_db.delete(0, END)
         engine = create_engine("mysql://{0}:{1}@{2}:{3}/{4}".format(user, password, host, port, database))  # after//= user:password@localhost(or ip address)/database name
         #lbl.config(text=f"Database: connection to the '{host}' for user '{user}' created successfully")
         r_set = engine.execute("SHOW TABLES")
@@ -45,20 +45,27 @@ def Choosing_Database():
         # input_tbl.pack()
 def create_table_list():
     i = 0
+    search_tbl = Entry(window, width=30)
+    search_tbl.insert(0, 'search for a table...')
+    search_tbl.grid(row=3, column=0)
+    search_btn = Button(window, text="Search", command=Choosing_Database)
+    search_btn.grid(row=3, column=1)
+    list_tbl = Label(window, text=f"Tables in {database}", width=20, borderwidth=2, relief="ridge", anchor='w',
+                     bg='green')
+    list_tbl.grid(row=4, column=0)
+
     for data in r_set:
         for j in range(len(data)):
             list_tables = Label(window, text=data[j], width=20, borderwidth=2, relief="ridge", anchor='w')
-            list_tables.grid(row=i + 7, column=j)
+            list_tables.grid(row=i + 5, column=j)
             checkDB = Button(window, text="Update", command=Choosing_Table)
-            checkDB.grid(row=i + 7, column=j+1)
+            checkDB.grid(row=i + 5, column=j+1)
         i = i + 1
     # inspector = inspect(engine)
     # tables = inspector.get_table_names()
     # total_rows = len(tables)
     # total_colums = len(tables) - 1
-    # list_tbl = Label(window, text=f"Tables in {database}", width=20, borderwidth=2, relief="ridge", anchor='w',
-    #                  bg='green')
-    # list_tbl.grid(row=6, column=0)
+    #
     # for dt in tables:
     #     print(dt)
     # for i in range(total_rows):
@@ -76,7 +83,7 @@ def Choosing_Table():
 
 input_lbl_db = Label(window, text="Database: ")
 input_lbl_db.grid(row=0, column=0)
-input_db = Text(window, height=1, width=30)
+input_db = Entry(window, width=30)
 input_db.grid()
 
 checkDB = Button(window, text="Submit", command=Choosing_Database)
