@@ -60,7 +60,7 @@ def create_table_list():
         for j in range(len(data)):
             list_tables = Label(table_frame, text=data[j], width=25, borderwidth=2, relief="ridge", anchor='w')
             list_tables.grid(row=i + 5, column=j, pady=2.5)
-            checkDB = Button(table_frame, text="Update", command=Choosing_Table)
+            checkDB = Button(table_frame, text="Update Table", command=Choosing_Table)
             checkDB.grid(row=i + 5, column=j+1, pady=2.5)
         i = i + 1
 
