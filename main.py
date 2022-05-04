@@ -50,13 +50,15 @@ def create_table_list():
     search_tbl.grid(row=3, column=0)
     search_btn = Button(window, text="Search", command=Choosing_Database)
     search_btn.grid(row=3, column=1)
-    list_tbl = Label(window, text=f"Tables in {database}", width=20, borderwidth=2, relief="ridge", anchor='w',
+    title = [i for i in r_set.keys()]
+    print(title)
+    list_tbl = Label(window, text=f"{title}", width=25, borderwidth=2, relief="ridge", anchor='w',
                      bg='green')
     list_tbl.grid(row=4, column=0)
 
     for data in r_set:
         for j in range(len(data)):
-            list_tables = Label(window, text=data[j], width=20, borderwidth=2, relief="ridge", anchor='w')
+            list_tables = Label(window, text=data[j], width=25, borderwidth=2, relief="ridge", anchor='w')
             list_tables.grid(row=i + 5, column=j)
             checkDB = Button(window, text="Update", command=Choosing_Table)
             checkDB.grid(row=i + 5, column=j+1)
