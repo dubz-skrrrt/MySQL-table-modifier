@@ -87,7 +87,9 @@ def check_Table(num):
 
 def Data_Table():
     # code
+    global headers
     headers = [i for i in selected_table.keys()]
+    entries()
     tree["columns"] = headers
     tree["show"] = 'headings'
     ind = 0
@@ -148,6 +150,11 @@ def open_Connector():
 
     checkDB = Button(dbConnect_Top, text="Submit", command=Choosing_Database)
     checkDB.pack(pady=10)
+
+def entries():
+    for entry in range(len(headers)):
+        input = Entry(window, width=20)
+        input.pack(side=LEFT)       # HERE for loop entries
 
 menubar = Menu(window)
 
