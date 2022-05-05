@@ -11,7 +11,7 @@ import xlrd
 
 window = tk.Tk()
 window.title("MySQL Table Modifier")
-window.geometry("600x680")
+window.geometry("1080x720")
 
 list_of_Tables =[]
 
@@ -37,12 +37,12 @@ def Choosing_Database():
             port,
             database))  # after//= user:password@localhost(or ip address)/database name
 
-        lbl.config(text=f"Database: connection to the '{host}' for user '{user}' created successfully")
+        #lbl.config(text=f"Database: connection to the '{host}' for user '{user}' created successfully")
         r_set = engine.execute("SHOW TABLES")
 
         create_table_list()
         print(f"connection to the {host} for user {user} created successfully")
-    except SQLAlchemyError as e:
+    except SQLAlchemyError and BaseException as e:
         print("Error in connecting to database due to the following error: ", e)
 
 def create_table_list():
@@ -64,7 +64,7 @@ def create_table_list():
 
             checkDB = Button(table_frame, text="Update Table")
             checkDB.configure(command=lambda b=data[ind]: check_Table(b))
-            checkDB.grid(row=i + 5, column=j+1, pady=2.5)
+            checkDB.grid(row=i + 5, column=j+1, pady=2.5, padx=50)
             list_of_Tables.append(data[ind])
 
             ind = ind+1
@@ -86,7 +86,7 @@ def Data_Table():
     tree["show"] = 'headings'
     ind = 0
     for heading in headers:
-        tree.column(heading, width=30, anchor='c')
+        tree.column(heading, width=10, anchor='c')
         tree.heading(heading, text=heading)
         ind += 1
     data_ind = 0
@@ -105,7 +105,7 @@ def Data_Table():
 
 input_lbl_db = Label(window, text="Database: ")
 input_lbl_db.pack()
-input_db = Entry(window, width=30)
+input_db = Entry(window, width=20)
 input_db.pack()
 
 checkDB = Button(window, text="Submit", command=Choosing_Database)
@@ -114,7 +114,7 @@ checkDB.pack()
 lbl = Label(window, text="")
 lbl.pack()
 
-table_frame = Frame(window)
+table_frame = Frame(window, borderwidth=2, relief='ridge')
 table_frame.pack()
 
 search_frame = Frame(window)
