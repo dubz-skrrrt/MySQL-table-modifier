@@ -13,6 +13,8 @@ window = tk.Tk()
 window.title("MySQL Table Modifier")
 window.geometry("600x680")
 
+list_of_Tables =[]
+
 def getInput():
     inp_db = input_db.get()
     return inp_db
@@ -45,11 +47,7 @@ def Choosing_Database():
 
 def create_table_list():
     i = 0
-    search_tbl = Entry(table_frame, width=25)
-    search_tbl.insert(0, 'search for a table...')
-    search_tbl.grid(row=3, column=0)
-    search_btn = Button(table_frame, text="Search", command=Choosing_Database)
-    search_btn.grid(row=3, column=1)
+
     title = [i for i in r_set.keys()]
     print(title)
     list_tbl = Label(table_frame, text=f"{title}", width=25, borderwidth=2, relief="ridge", anchor='w',
@@ -57,17 +55,53 @@ def create_table_list():
     list_tbl.grid(row=4, column=0, pady=10)
 
     for data in r_set:
+
         for j in range(len(data)):
+            ind = 0
+
             list_tables = Label(table_frame, text=data[j], width=25, borderwidth=2, relief="ridge", anchor='w')
             list_tables.grid(row=i + 5, column=j, pady=2.5)
-            checkDB = Button(table_frame, text="Update Table", command=Choosing_Table)
+
+            checkDB = Button(table_frame, text="Update Table")
+            checkDB.configure(command=lambda b=data[ind]: check_Table(b))
             checkDB.grid(row=i + 5, column=j+1, pady=2.5)
+            list_of_Tables.append(data[ind])
+
+            ind = ind+1
         i = i + 1
 
-def Choosing_Table():
-    # code
+def check_Table(num):
+    global selected_table
+    for tables in list_of_Tables:
+        if num == tables:
+            table = tables
+            print(table)
+            selected_table = engine.execute(f"""SELECT * FROM {table}""")
+            Data_Table()
 
-    print()
+def Data_Table():
+    # code
+    headers = [i for i in selected_table.keys()]
+    tree["columns"] = headers
+    tree["show"] = 'headings'
+    ind = 0
+    for heading in headers:
+        tree.column(heading, width=30, anchor='c')
+        tree.heading(heading, text=heading)
+        ind += 1
+    data_ind = 0
+    for data in selected_table:
+        print(data)
+        tree.insert(parent="", index='end', iid=data[data_ind], text=data[data_ind], values=data[0:len(data)])
+        data_ind += 1
+    search_tbl = Entry(search_frame, width=25)
+    search_tbl.insert(0, 'search for id...')
+    search_tbl.grid(row=10, column=0)
+    search_btn = Button(search_frame, text="Search", command=Choosing_Database)
+    search_btn.grid(row=10, column=1)
+
+
+
 
 input_lbl_db = Label(window, text="Database: ")
 input_lbl_db.pack()
@@ -82,7 +116,17 @@ lbl.pack()
 
 table_frame = Frame(window)
 table_frame.pack()
-print(window.grid_size())
+
+search_frame = Frame(window)
+search_frame.pack()
+data_table_frame = Frame(window)
+data_table_frame.pack()
+tree = ttk.Treeview(data_table_frame, selectmode='browse')
+tree.pack(side="left")
+scroll = ttk.Scrollbar(data_table_frame, orient="vertical", command=tree.yview)
+scroll.pack(side="right", fill="y")
+
+tree.configure(yscrollcommand=scroll.set)
 #Choosing_Database()
 window.mainloop()
 
