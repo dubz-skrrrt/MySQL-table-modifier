@@ -128,7 +128,7 @@ def singleData_Table():
 
 def selectDetails(items):
     curItem = tree.focus()
-    print(tree.item(curItem, option='values'))      # returns the values of the clicked row
+    print(tree.item(curItem, option='values'))      # returns the values of the clicked row (need to pass the values for each entry)
 
 def delete_Table():
     x = tree.selection()
@@ -154,7 +154,7 @@ def open_Connector():
 def entries():
     for entry in range(len(headers)):
         input = Entry(window, width=20)
-        input.pack(side=LEFT)       # HERE for loop entries
+        input.pack(side=LEFT)       # HERE for loop entries must be able to update
 
 menubar = Menu(window)
 
