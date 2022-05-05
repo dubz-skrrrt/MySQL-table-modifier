@@ -86,7 +86,7 @@ def Data_Table():
     tree["show"] = 'headings'
     ind = 0
     for heading in headers:
-        tree.column(heading, width=10, anchor='c')
+        tree.column(heading, width=5, anchor='c')
         tree.heading(heading, text=heading)
         ind += 1
     data_ind = 0
@@ -100,7 +100,9 @@ def Data_Table():
     search_btn = Button(search_frame, text="Search", command=Choosing_Database)
     search_btn.grid(row=10, column=1)
 
-
+def selectDetails(items):
+    curItem = tree.focus()
+    print(tree.item(curItem, option='values'))
 
 
 input_lbl_db = Label(window, text="Database: ")
@@ -119,14 +121,15 @@ table_frame.pack()
 
 search_frame = Frame(window)
 search_frame.pack()
-data_table_frame = Frame(window)
+data_table_frame = Frame(window, width=50)
 data_table_frame.pack()
-tree = ttk.Treeview(data_table_frame, selectmode='browse')
+tree = ttk.Treeview(data_table_frame, selectmode='browse', height=5)
 tree.pack(side="left")
 scroll = ttk.Scrollbar(data_table_frame, orient="vertical", command=tree.yview)
 scroll.pack(side="right", fill="y")
-
 tree.configure(yscrollcommand=scroll.set)
+tree.bind('<Motion>', 'break')
+tree.bind('<ButtonRelease-1>', selectDetails)
 #Choosing_Database()
 window.mainloop()
 
