@@ -76,7 +76,7 @@ def check_Table(num):
         if num == tables:
             table = tables
             print(table)
-            selected_table = engine.execute(f"""SELECT * FROM {table}""")
+            selected_table = engine.execute(f"""SELECT * FROM {table}""")   # selects and executes the table
             Data_Table()
 
 def Data_Table():
@@ -85,24 +85,27 @@ def Data_Table():
     tree["columns"] = headers
     tree["show"] = 'headings'
     ind = 0
-    for heading in headers:
+    for heading in headers:                         # Creates the headers for the treeview table
         tree.column(heading, width=5, anchor='c')
         tree.heading(heading, text=heading)
         ind += 1
     data_ind = 0
     for data in selected_table:
-        print(data)
-        tree.insert(parent="", index='end', iid=data[data_ind], text=data[data_ind], values=data[0:len(data)])
+        tree.insert(parent="",
+                    index='end',
+                    iid=data[data_ind],
+                    text=data[data_ind],
+                    values=data[0:len(data)])       # Pass the data from mySQL table to the treeview table
         data_ind += 1
     search_tbl = Entry(search_frame, width=25)
     search_tbl.insert(0, 'search for id...')
     search_tbl.grid(row=10, column=0)
-    search_btn = Button(search_frame, text="Search", command=Choosing_Database)
+    search_btn = Button(search_frame, text="Search")
     search_btn.grid(row=10, column=1)
 
 def selectDetails(items):
     curItem = tree.focus()
-    print(tree.item(curItem, option='values'))
+    print(tree.item(curItem, option='values'))      # returns the values of the clicked row
 
 
 input_lbl_db = Label(window, text="Database: ")
