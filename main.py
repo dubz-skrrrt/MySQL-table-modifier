@@ -194,43 +194,52 @@ def entries():
 
 def pass_entrytotable():
     global tuple_item
-    selected = tree.focus()
-    tuple_items = []
-    for items in list_of_entry_widgets:     # passes the entries into a list
-        data = items.get()
-        tuple_items.append(data)
+    try:
+        selected = tree.focus()
+        tuple_items = []
+        for items in list_of_entry_widgets:     # passes the entries into a list
+            data = items.get()
+            tuple_items.append(data)
 
-    tuple_item = tuple(tuple_items)
-    print(tuple_item)
-    tree.item(selected, values=tuple_item)  # updates the treeview on the new values of each column based on the data passed from the entries
-    updatedatabase(tuple_item[0])
+        tuple_item = tuple(tuple_items)
+        print(tuple_item)
+        tree.item(selected, values=tuple_item)  # updates the treeview on the new values of each column based on the data passed from the entries
+        updatedatabase(tuple_item[0])
+    except IndexError as e:
+        messagebox.showerror("Error", e)
 
 def updatedatabase(id):
     global key, set_string
     items = []
     count=0
+    try:
 
-    for keys in headers:   # gets the headers and the data entries then collates all together to be formatted into the sql query
-        key = keys + " = " + "'" + tuple_item[count] + "'"
-        items.append(key)
-        count +=1
+        for keys in headers:   # gets the headers and the data entries then collates all together to be formatted into the sql query
+            key = keys + " = " + "'" + tuple_item[count] + "'"
+            items.append(key)
+            count +=1
 
-    set_string = ", ".join(items)
-    print(set_string)
+        set_string = ", ".join(items)
+        print(set_string)
 
-    updatequery = f"""UPDATE {table} SET {set_string} WHERE {headers[0]} = {id}""" # Finds the row of the selected table and updates it based on the set variable
-    engine.execute(updatequery)
-    messagebox.showinfo('UPDATED', f'Your {table} has been Updated in {id}. \n Values: {set_string}')
+        updatequery = f"""UPDATE {table} SET {set_string} WHERE {headers[0]} = {id}""" # Finds the row of the selected table and updates it based on the set variable
+        engine.execute(updatequery)
+        messagebox.showinfo('UPDATED', f'Your {table} has been Updated in {id}. \n Values: {set_string}')
+    except SQLAlchemyError as e:
+        messagebox.showerror("Error", e)
 def insertdata():
     global entry, entrylist
-    entrylist = []
-    for results in list_of_entry_widgets:     # passes the entries into a list
-        data = results.get()
-        entrylist.append(data)
-    entry_string = ", ".join(entrylist)
-    print(entrylist)
+    try:
+        entrylist = []
+        for results in list_of_entry_widgets:     # passes the entries into a list
+            data = results.get()
+            entrylist.append(data)
+        entry_string = ", ".join(entrylist)
+        print(entrylist)
 
-    insertdatabase(entrylist[0])
+        insertdatabase(entrylist[0])
+    except IndexError as e:
+        messagebox.showerror("Error", e)
 
 def insertdatabase(ID):
     insert = False
@@ -260,7 +269,7 @@ def insertdatabase(ID):
             engine.execute(insert_query)
 
             messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
-    except SQLAlchemyError as e:
+    except (SQLAlchemyError, IndexError) as e:
         messagebox.showerror("Error", e)
 
 def showappinfo():
