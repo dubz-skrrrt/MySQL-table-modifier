@@ -201,6 +201,7 @@ def pass_entrytotable():
         tuple_items.append(data)
 
     tuple_item = tuple(tuple_items)
+    print(tuple_item)
     tree.item(selected, values=tuple_item)  # updates the treeview on the new values of each column based on the data passed from the entries
     updatedatabase(tuple_item[0])
 
@@ -227,40 +228,38 @@ def insertdata():
         data = results.get()
         entrylist.append(data)
     entry_string = ", ".join(entrylist)
-    print(entry_string)
+    print(entrylist)
 
     insertdatabase(entrylist[0])
 
 def insertdatabase(ID):
-    insert = 0
+    insert = False
     temp = []
     for t in range(len(entrylist)):
         if (t == 0):
             id = entrylist[t]
             temp.append(id)
+        #
         else:
             entry = "'" + entrylist[t] + "'"
             temp.append(entry)
         #print(temp)
     try:
         z = ", ".join(temp)
-        count =0
         insert_query = f"""INSERT IGNORE INTO {table} VALUES ({z})"""
-        cur_id = tree.focus()
-        selvalue = tree.item(cur_id)['values']
-        print(selvalue)
+        child = tree.get_children('')
+        for ch in child:
+            data = tree.item(ch, "values")
+            if ID in data:
+                insert = True
+                print("found")
 
-        if tree.exists(cur_id)==True:
-            print("exist")
-        else:
-            insert = 1
-        if insert == 1:
+        if insert is False:
             tree.insert("", 'end', values=(entrylist))
             print("insert")
-            #insert = False
-            #engine.execute(insert_query)
+            engine.execute(insert_query)
 
-        messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
+            messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
     except SQLAlchemyError as e:
         messagebox.showerror("Error", e)
 
