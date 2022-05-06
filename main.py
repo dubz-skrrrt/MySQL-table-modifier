@@ -198,6 +198,7 @@ def get_entry():
        print(results.get())
 
 def pass_entrytotable():
+    global tuple_item
     selected = tree.focus()
     tuple_items = []
     for items in list_of_entry_widgets:
@@ -210,10 +211,21 @@ def pass_entrytotable():
     updatedatabase(tuple_item[0])
 
 def updatedatabase(id):
-    updatequery = f"""UPDATE {table} * WHERE id = {id}"""
+    global key, set_string
+    items = []
+    count=0
+    for keys in headers:
+        key = keys + " = " + "'" + tuple_item[count] + "'"
+        items.append(key)
+        count +=1
+
+    set_string = ", ".join(items)
+    print(set_string)
+
+    updatequery = f"""UPDATE {table} SET {set_string} WHERE id = {id}"""
     print(updatequery)
     engine.execute(updatequery)
-    engine.commit()
+
 
 menubar = Menu(window)
 
@@ -252,8 +264,9 @@ entry_headings_frame.pack(pady=25)
 entry_frame = Frame(window, borderwidth=2, relief='ridge')
 entry_frame.pack(pady=25)
 
-test = Button(entry_frame, text="click", command=pass_entrytotable)
-test.pack()
+Update = Button(entry_frame, text="Update", command=pass_entrytotable)
+Update.pack()
+
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
 #Choosing_Database()
 window.config(menu=menubar)
