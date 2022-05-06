@@ -93,14 +93,14 @@ def Data_Table():
     global headers
     num = 0
     headers = [i for i in selected_table.keys()]
-
     tree["columns"] = headers
     tree["show"] = 'headings'
     ind = 0
 
     delete_Table()
-    clear_entry(list_of_entry_lbl)
     clear_entry(list_of_entry_widgets)
+    clear_entry(list_of_entry_lbl)
+
 
     entries()
     print(list_of_entry_widgets)
@@ -122,7 +122,7 @@ def singleData_Table():
     try:
         for records in tree.get_children():
             tree.delete(records)
-        single_data = engine.execute(f"""SELECT * FROM {table} WHERE id = {id_details}""")
+        single_data = engine.execute(f"""SELECT * FROM {table} WHERE {headers[0]} = {id_details}""")
         results = single_data.fetchone()
         print(results)
         tree.insert(parent="",
@@ -143,6 +143,7 @@ def delete_Table():
 def clear_entry(list_of_widgets):
     for widgets in list_of_widgets:
         widgets.destroy()
+    del list_of_widgets[:]
 
 def clearDataEntry():
     for inputs in list_of_entry_widgets:
@@ -216,32 +217,52 @@ def updatedatabase(id):
     set_string = ", ".join(items)
     print(set_string)
 
-    updatequery = f"""UPDATE {table} SET {set_string} WHERE id = {id}""" # Finds the row of the selected table and updates it based on the set variable
+    updatequery = f"""UPDATE {table} SET {set_string} WHERE {headers[0]} = {id}""" # Finds the row of the selected table and updates it based on the set variable
     engine.execute(updatequery)
     messagebox.showinfo('UPDATED', f'Your {table} has been Updated in {id}. \n Values: {set_string}')
 def insertdata():
     global entry, entrylist
-    print(len(list_of_entry_widgets))
     entrylist = []
     for results in list_of_entry_widgets:     # passes the entries into a list
         data = results.get()
         entrylist.append(data)
     entry_string = ", ".join(entrylist)
     print(entry_string)
-    tree.insert("", 'end', values=(entrylist))
-    insertdatabase()
-def insertdatabase():
+
+    insertdatabase(entrylist[0])
+
+def insertdatabase(ID):
+    insert = 0
     temp = []
-    count = 0
     for t in range(len(entrylist)):
-        entry = "'" + entrylist[count] + "'"
-        temp.append(entry)
-        count+=1
-    z = ", ".join(temp)
-    print(z)
-    insertquery = f"""INSERT INTO {table} VALUES ({z}) IF NOT EXIST"""
-    engine.execute(insertquery)
-    messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
+        if (t == 0):
+            id = entrylist[t]
+            temp.append(id)
+        else:
+            entry = "'" + entrylist[t] + "'"
+            temp.append(entry)
+        #print(temp)
+    try:
+        z = ", ".join(temp)
+        count =0
+        insert_query = f"""INSERT IGNORE INTO {table} VALUES ({z})"""
+        cur_id = tree.focus()
+        selvalue = tree.item(cur_id)['values']
+        print(selvalue)
+
+        if tree.exists(cur_id)==True:
+            print("exist")
+        else:
+            insert = 1
+        if insert == 1:
+            tree.insert("", 'end', values=(entrylist))
+            print("insert")
+            #insert = False
+            #engine.execute(insert_query)
+
+        messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
+    except SQLAlchemyError as e:
+        messagebox.showerror("Error", e)
 
 def showappinfo():
     global search_frame, search_tbl, data_table_frame, tree,entry_headings_frame,entry_frame,button_frame
