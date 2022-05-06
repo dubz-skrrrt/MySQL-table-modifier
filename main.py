@@ -12,7 +12,8 @@ window.title("MySQL Table Modifier")
 window.geometry("1080x720")
 
 list_of_Tables =[]
-list_of_widgets = []
+list_of_entry_lbl = []
+list_of_entry_widgets = []
 
 def getInput():
     inp_db = input_db.get()
@@ -90,15 +91,17 @@ def Data_Table():
     # code
     global headers
     headers = [i for i in selected_table.keys()]
-    entries()
+
     tree["columns"] = headers
     tree["show"] = 'headings'
     ind = 0
 
     delete_Table()
-    clear_entry(list_of_widgets)
+    clear_entry(list_of_entry_lbl)
+    clear_entry(list_of_entry_widgets)
 
     entries()
+    print(list_of_entry_widgets)
     for heading in headers:                         # Creates the headers for the treeview table
         tree.column(heading, width=15*len(headers), anchor='c')
         tree.heading(heading, text=heading)
@@ -161,14 +164,21 @@ def open_Connector():
     checkDB.pack(pady=10)
 
 def entries():
+
     for headings in headers:
         entryLbl = Label(entry_headings_frame, width=15, text=headings)
         entryLbl.pack(side=LEFT)
-        list_of_widgets.append(entryLbl)
+        list_of_entry_lbl.append(entryLbl)
     for entry in range(len(headers)):
-        input = Entry(entry_frame, width=18)
+        var = tk.StringVar()
+        input = Entry(entry_frame, width=18, textvariable=var)
         input.pack(side=LEFT)       # HERE for loop entries must be able to update
-        list_of_widgets.append(input)
+        list_of_entry_widgets.append(input)
+
+def get_entry():
+    for results in list_of_entry_widgets:
+       print(results.get())
+
 
 menubar = Menu(window)
 
@@ -206,6 +216,9 @@ entry_headings_frame = Frame(window, borderwidth=2, relief='ridge')
 entry_headings_frame.pack(pady=25)
 entry_frame = Frame(window, borderwidth=2, relief='ridge')
 entry_frame.pack(pady=25)
+
+test = Button(entry_frame, text="click", command=get_entry)
+test.pack()
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
 #Choosing_Database()
 window.config(menu=menubar)
