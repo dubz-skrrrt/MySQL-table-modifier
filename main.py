@@ -174,7 +174,6 @@ def selectDetails(items):
         passdata.insert(0, list_of_data[i])
         i+=1
 
-
 def clearDataEntry():
     for inputs in list_of_entry_widgets:
         inputs.delete(0, END)
@@ -200,7 +199,14 @@ def get_entry():
     for results in list_of_entry_widgets:
        print(results.get())
 
+def pass_entrytotable():
+    selected = tree.focus()
+    i = 1
 
+    for dataresults in list_of_entry_widgets:
+        datash = dataresults.get()
+        i+=1
+    tree.item(selected, text=datash, values=datash[0:len(datash)])
 
 menubar = Menu(window)
 
@@ -239,7 +245,7 @@ entry_headings_frame.pack(pady=25)
 entry_frame = Frame(window, borderwidth=2, relief='ridge')
 entry_frame.pack(pady=25)
 
-test = Button(entry_frame, text="click", command=get_entry)
+test = Button(entry_frame, text="click", command=pass_entrytotable)
 test.pack()
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
 #Choosing_Database()
