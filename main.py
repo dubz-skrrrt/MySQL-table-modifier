@@ -260,11 +260,13 @@ tree.bind('<Motion>', 'break')
 tree.bind('<ButtonRelease-1>', selectDetails)
 
 entry_headings_frame = Frame(window, borderwidth=2, relief='ridge')
-entry_headings_frame.pack(pady=25)
+entry_headings_frame.pack()
 entry_frame = Frame(window, borderwidth=2, relief='ridge')
-entry_frame.pack(pady=25)
+entry_frame.pack(pady=10)
 
-Update = Button(entry_frame, text="Update", command=pass_entrytotable)
+button_frame = Frame(window, borderwidth=2, relief='ridge')
+button_frame.pack(pady=25)
+Update = Button(button_frame, text="Update", command=pass_entrytotable)
 Update.pack()
 
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
