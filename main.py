@@ -14,7 +14,7 @@ window.geometry("1080x720")
 list_of_Tables =[]
 list_of_entry_lbl = []
 list_of_entry_widgets = []
-
+list_of_data = []
 def getInput():
     inp_db = input_db.get()
     return inp_db
@@ -90,6 +90,7 @@ def check_Table(num):
 def Data_Table():
     # code
     global headers
+    num = 0
     headers = [i for i in selected_table.keys()]
 
     tree["columns"] = headers
@@ -109,7 +110,6 @@ def Data_Table():
 
     data_ind = 0
     for data in selected_table:
-        print(data)
         tree.insert(parent="",
                     index='end',
                     iid=data[data_ind],
@@ -133,9 +133,6 @@ def singleData_Table():
         print(f"Couldn't search due to the following error: {e}")
         messagebox.showerror('Python Error', f"Couldn't search due to the following error: {e}")
 
-def selectDetails(items):
-    curItem = tree.focus()
-    print(tree.item(curItem, option='values'))      # returns the values of the clicked row (need to pass the values for each entry)
 
 def delete_Table():
     x = tree.selection()
@@ -162,8 +159,29 @@ def open_Connector():
 
     checkDB = Button(dbConnect_Top, text="Submit", command=Choosing_Database)
     checkDB.pack(pady=10)
+def selectDetails(items):
+    global values
+    clearDataEntry()
+    curItem = tree.focus()
+    #print(tree.item(curItem, option='values'))      # returns the values of the clicked row (need to pass the values for each entry)
+    values = tree.item(curItem, option='values')
+    i = 0
+    print(values[0])
+    for data in values:
+        list_of_data.append(data)
+    print(list_of_data)
+    for passdata in list_of_entry_widgets:
+        passdata.insert(0, list_of_data[i])
+        i+=1
+
+
+def clearDataEntry():
+    for inputs in list_of_entry_widgets:
+        inputs.delete(0, END)
+
 
 def entries():
+    global input
 
     for headings in headers:
         entryLbl = Label(entry_headings_frame, width=15, text=headings)
@@ -171,13 +189,16 @@ def entries():
         list_of_entry_lbl.append(entryLbl)
     for entry in range(len(headers)):
         var = tk.StringVar()
+
         input = Entry(entry_frame, width=18, textvariable=var)
         input.pack(side=LEFT)       # HERE for loop entries must be able to update
         list_of_entry_widgets.append(input)
 
+
 def get_entry():
     for results in list_of_entry_widgets:
        print(results.get())
+
 
 
 menubar = Menu(window)
