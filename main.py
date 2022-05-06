@@ -166,10 +166,8 @@ def selectDetails(items):
     #print(tree.item(curItem, option='values'))      # returns the values of the clicked row (need to pass the values for each entry)
     values = tree.item(curItem, option='values')
     i = 0
-    print(values[0])
     for data in values:
         list_of_data.append(data)
-    print(list_of_data)
     for passdata in list_of_entry_widgets:
         passdata.insert(0, list_of_data[i])
         i+=1
@@ -201,12 +199,15 @@ def get_entry():
 
 def pass_entrytotable():
     selected = tree.focus()
-    i = 1
+    tuple_items = []
+    for items in list_of_entry_widgets:
+        data = items.get()
+        tuple_items.append(data)
 
-    for dataresults in list_of_entry_widgets:
-        datash = dataresults.get()
-        i+=1
-    tree.item(selected, text=datash, values=datash[0:len(datash)])
+    tuple_item = tuple(tuple_items)
+    print(tuple_item)
+    tree.item(selected, values=tuple_item)
+
 
 menubar = Menu(window)
 
