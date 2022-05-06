@@ -207,7 +207,13 @@ def pass_entrytotable():
     tuple_item = tuple(tuple_items)
     print(tuple_item)
     tree.item(selected, values=tuple_item)
+    updatedatabase(tuple_item[0])
 
+def updatedatabase(id):
+    updatequery = f"""UPDATE {table} * WHERE id = {id}"""
+    print(updatequery)
+    engine.execute(updatequery)
+    engine.commit()
 
 menubar = Menu(window)
 
