@@ -12,6 +12,7 @@ window.title("MySQL Table Modifier")
 window.geometry("1080x720")
 
 list_of_Tables =[]
+list_of_widgets = []
 
 def getInput():
     inp_db = input_db.get()
@@ -95,6 +96,9 @@ def Data_Table():
     ind = 0
 
     delete_Table()
+    clear_entry(list_of_widgets)
+
+    entries()
     for heading in headers:                         # Creates the headers for the treeview table
         tree.column(heading, width=15*len(headers), anchor='c')
         tree.heading(heading, text=heading)
@@ -137,6 +141,11 @@ def delete_Table():
     for item in tree.get_children():
         tree.delete(item)
 
+def clear_entry(list_of_widgets):
+    for widgets in list_of_widgets:
+        widgets.destroy()
+
+
 def open_Connector():
     global input_db, dbConnect_Top
     dbConnect_Top = Toplevel(window)
@@ -152,9 +161,14 @@ def open_Connector():
     checkDB.pack(pady=10)
 
 def entries():
+    for headings in headers:
+        entryLbl = Label(entry_headings_frame, width=15, text=headings)
+        entryLbl.pack(side=LEFT)
+        list_of_widgets.append(entryLbl)
     for entry in range(len(headers)):
-        input = Entry(window, width=20)
+        input = Entry(entry_frame, width=18)
         input.pack(side=LEFT)       # HERE for loop entries must be able to update
+        list_of_widgets.append(input)
 
 menubar = Menu(window)
 
@@ -175,10 +189,10 @@ search_tbl.pack(side="left", padx=25)
 search_btn = Button(search_frame, text="Search ID", command=singleData_Table)
 search_btn.pack(side='right')
 
-data_table_frame = Frame(window, width=500)
+data_table_frame = Frame(window, width=50)
 data_table_frame.pack()
 
-tree = ttk.Treeview(data_table_frame, selectmode='browse', height=15)
+tree = ttk.Treeview(data_table_frame, selectmode='browse', height=10)
 tree.pack(side="left")
 style = ttk.Style()
 style.theme_use("default")
@@ -187,6 +201,11 @@ scroll.pack(side="right", fill="y")
 tree.configure(yscrollcommand=scroll.set)
 tree.bind('<Motion>', 'break')
 tree.bind('<ButtonRelease-1>', selectDetails)
+
+entry_headings_frame = Frame(window, borderwidth=2, relief='ridge')
+entry_headings_frame.pack(pady=25)
+entry_frame = Frame(window, borderwidth=2, relief='ridge')
+entry_frame.pack(pady=25)
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
 #Choosing_Database()
 window.config(menu=menubar)
