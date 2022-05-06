@@ -75,8 +75,6 @@ def create_table_list():
             ind = ind+1
         i = i + 1
 
-
-
 def check_Table(num):
     global selected_table, search_tbl, table
     #menubar.add_cascade(label="Choose Table", command=create_table_list)
@@ -116,6 +114,7 @@ def Data_Table():
                     text=data[data_ind],
                     values=data[0:len(data)])       # Pass the data from mySQL table to the treeview table
         data_ind += 1
+
 def singleData_Table():
     id_details = search_tbl.get()
     #print(id_details)
@@ -133,7 +132,6 @@ def singleData_Table():
         print(f"Couldn't search due to the following error: {e}")
         messagebox.showerror('Python Error', f"Couldn't search due to the following error: {e}")
 
-
 def delete_Table():
     x = tree.selection()
     for records in x:
@@ -145,6 +143,10 @@ def clear_entry(list_of_widgets):
     for widgets in list_of_widgets:
         widgets.destroy()
 
+def clearDataEntry():
+    for inputs in list_of_entry_widgets:
+        inputs.delete(0, END)
+    del list_of_data[:]
 
 def open_Connector():
     global input_db, dbConnect_Top
@@ -159,6 +161,7 @@ def open_Connector():
 
     checkDB = Button(dbConnect_Top, text="Submit", command=Choosing_Database)
     checkDB.pack(pady=10)
+
 def selectDetails(items):
     global values
     clearDataEntry()
@@ -172,49 +175,39 @@ def selectDetails(items):
         passdata.insert(0, list_of_data[i])
         i+=1
 
-def clearDataEntry():
-    for inputs in list_of_entry_widgets:
-        inputs.delete(0, END)
-    del list_of_data[:]
-
-
 def entries():
     global input
 
     for headings in headers:
-        entryLbl = Label(entry_headings_frame, width=15, text=headings, anchor='c')
+        entryLbl = Label(entry_headings_frame, width=15, text=headings)
         entryLbl.pack(side=LEFT)
         list_of_entry_lbl.append(entryLbl)
+
     for entry in range(len(headers)):
         var = tk.StringVar()
-
         input = Entry(entry_frame, width=18, textvariable=var, justify="center")
         input.pack(side=LEFT)       # HERE for loop entries must be able to update
         list_of_entry_widgets.append(input)
 
 
-def get_entry():
-    for results in list_of_entry_widgets:
-       print(results.get())
-
 def pass_entrytotable():
     global tuple_item
     selected = tree.focus()
     tuple_items = []
-    for items in list_of_entry_widgets:
+    for items in list_of_entry_widgets:     # passes the entries into a list
         data = items.get()
         tuple_items.append(data)
 
     tuple_item = tuple(tuple_items)
-    print(tuple_item)
-    tree.item(selected, values=tuple_item)
+    tree.item(selected, values=tuple_item)  # updates the treeview on the new values of each column based on the data passed from the entries
     updatedatabase(tuple_item[0])
 
 def updatedatabase(id):
     global key, set_string
     items = []
     count=0
-    for keys in headers:
+
+    for keys in headers:   # gets the headers and the data entries then collates all together to be formatted into the sql query
         key = keys + " = " + "'" + tuple_item[count] + "'"
         items.append(key)
         count +=1
@@ -222,8 +215,7 @@ def updatedatabase(id):
     set_string = ", ".join(items)
     print(set_string)
 
-    updatequery = f"""UPDATE {table} SET {set_string} WHERE id = {id}"""
-    print(updatequery)
+    updatequery = f"""UPDATE {table} SET {set_string} WHERE id = {id}""" # Finds the row of the selected table and updates it based on the set variable
     engine.execute(updatequery)
 
 
