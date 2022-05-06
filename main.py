@@ -182,13 +182,13 @@ def entries():
     global input
 
     for headings in headers:
-        entryLbl = Label(entry_headings_frame, width=15, text=headings)
+        entryLbl = Label(entry_headings_frame, width=15, text=headings, anchor='c')
         entryLbl.pack(side=LEFT)
         list_of_entry_lbl.append(entryLbl)
     for entry in range(len(headers)):
         var = tk.StringVar()
 
-        input = Entry(entry_frame, width=18, textvariable=var)
+        input = Entry(entry_frame, width=18, textvariable=var, justify="center")
         input.pack(side=LEFT)       # HERE for loop entries must be able to update
         list_of_entry_widgets.append(input)
 
