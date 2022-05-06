@@ -178,6 +178,7 @@ def selectDetails(items):
 def clearDataEntry():
     for inputs in list_of_entry_widgets:
         inputs.delete(0, END)
+    del list_of_data[:]
 
 
 def entries():
