@@ -9,7 +9,7 @@ import xlrd
 
 window = tk.Tk()
 window.title("MySQL Table Modifier")
-window.geometry("1080x720")
+window.state('zoomed')
 
 list_of_Tables =[]
 list_of_entry_lbl = []
@@ -42,6 +42,9 @@ def Choosing_Database():
         create_table_list()
         dbConnect_Top.destroy()
         print(f"connection to the {host} for user {user} created successfully")
+        showappinfo()
+        lbl.destroy()
+        lbl1.destroy()
     except (SQLAlchemyError, BaseException) as e:
         messagebox.showerror("Error in connecting to database due to the following error: ", e)
 
@@ -59,10 +62,10 @@ def create_table_list():
         for j in range(len(data)):
             ind = 0
 
-            list_tables = Label(table_frame, text=data[j], width=25, borderwidth=2, relief="ridge", anchor='w')
+            list_tables = Label(table_frame, text=data[j], width=25, borderwidth=2, relief="ridge", anchor='w', fg='white',bg="#676769")
             list_tables.grid(row=i + 5, column=j, pady=2.5)
 
-            checkDB = Button(table_frame, text="Update Table")
+            checkDB = Button(table_frame, text="Update Table", fg='white', bg="#676769")
 
             checkDB.grid(row=i + 5, column=j+1, padx=50)
             if data[ind] not in list_of_Tables:
@@ -110,8 +113,6 @@ def Data_Table():
     for data in selected_table:
         tree.insert(parent="",
                     index='end',
-                    iid=data[data_ind],
-                    text=data[data_ind],
                     values=data[0:len(data)])       # Pass the data from mySQL table to the treeview table
         data_ind += 1
 
@@ -217,53 +218,81 @@ def updatedatabase(id):
 
     updatequery = f"""UPDATE {table} SET {set_string} WHERE id = {id}""" # Finds the row of the selected table and updates it based on the set variable
     engine.execute(updatequery)
+    messagebox.showinfo('UPDATED', f'Your {table} has been Updated in {id}. \n Values: {set_string}')
+def insertdata():
+    global entry, entrylist
+    print(len(list_of_entry_widgets))
+    entrylist = []
+    for results in list_of_entry_widgets:     # passes the entries into a list
+        data = results.get()
+        entrylist.append(data)
+    entry_string = ", ".join(entrylist)
+    print(entry_string)
+    tree.insert("", 'end', values=(entrylist))
+    insertdatabase()
+def insertdatabase():
+    temp = []
+    count = 0
+    for t in range(len(entrylist)):
+        entry = "'" + entrylist[count] + "'"
+        temp.append(entry)
+        count+=1
+    z = ", ".join(temp)
+    print(z)
+    insertquery = f"""INSERT INTO {table} VALUES ({z}) IF NOT EXIST"""
+    engine.execute(insertquery)
+    messagebox.showinfo('ADDED', f'A new data has been added to your {table}. \n Values: {z}')
 
+def showappinfo():
+    global search_frame, search_tbl, data_table_frame, tree,entry_headings_frame,entry_frame,button_frame
+    search_frame = Frame(window, width=window.winfo_width() , bg="#676769")
+    print(window.winfo_width())
+    search_frame.pack(pady=25)
 
+    search_tbl = Entry(search_frame, width=50)
+    search_tbl.insert(0, 'search for id...')
+    search_tbl.pack(side="left", padx=25)
+    search_btn = Button(search_frame, text="Search ID",font=("Arial", 10, "bold"), fg='white', command=singleData_Table, bg="#676769")
+    search_btn.pack(side='right')
+
+    data_table_frame = Frame(window, width=50, bg="#676769")
+    data_table_frame.pack()
+
+    tree = ttk.Treeview(data_table_frame, selectmode='browse', height=20)
+    tree.pack(side="left")
+    style = ttk.Style()
+    style.theme_use("default")
+    scroll = ttk.Scrollbar(data_table_frame, orient="vertical", command=tree.yview)
+    scroll.pack(side="right", fill="y")
+    tree.configure(yscrollcommand=scroll.set)
+    tree.bind('<Motion>', 'break')
+    tree.bind('<ButtonRelease-1>', selectDetails)
+    lbl3 = Label(window, text=" ", bg="#373738")
+    lbl3.pack(pady=10)
+    entry_headings_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
+    entry_headings_frame.pack()
+    entry_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
+    entry_frame.pack(pady=10)
+
+    button_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
+    button_frame.pack(pady=25)
+    Update = Button(button_frame, text="Update",font=("Arial", 10, "bold"), fg='white', command=pass_entrytotable, bg="#676769")
+    Update.pack(side="left", padx=25)
+    Insert_btn = Button(button_frame, text="Insert",font=("Arial", 10, "bold"), fg='white', command=insertdata,bg="#676769")
+    Insert_btn.pack(side="left", padx=25)
+
+lbl = Label(window, text="MUST CONNECT TO DATABASE", font=("Arial", 30, "bold"), fg='white', bg='#373738')
+lbl.pack(expand=TRUE, pady=20)
+lbl1 = Label(window, text="Click 'CONNECT DATABASE ENGINE' on upper the Left Corner.", font=("Arial", 20),fg='#4c9a41', bg='#373738')
+lbl1.pack(pady=10)
+table_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
+table_frame.pack(pady=25)
 menubar = Menu(window)
 
-lbl = Label(window, text="")
-lbl.pack()
-
-
-table_frame = Frame(window, borderwidth=2, relief='ridge')
-table_frame.pack(pady=25)
-
-search_frame = Frame(window, width=window.winfo_width())
-print(window.winfo_width())
-search_frame.pack(pady=25)
-
-search_tbl = Entry(search_frame, width=50)
-search_tbl.insert(0, 'search for id...')
-search_tbl.pack(side="left", padx=25)
-search_btn = Button(search_frame, text="Search ID", command=singleData_Table)
-search_btn.pack(side='right')
-
-data_table_frame = Frame(window, width=50)
-data_table_frame.pack()
-
-tree = ttk.Treeview(data_table_frame, selectmode='browse', height=10)
-tree.pack(side="left")
-style = ttk.Style()
-style.theme_use("default")
-scroll = ttk.Scrollbar(data_table_frame, orient="vertical", command=tree.yview)
-scroll.pack(side="right", fill="y")
-tree.configure(yscrollcommand=scroll.set)
-tree.bind('<Motion>', 'break')
-tree.bind('<ButtonRelease-1>', selectDetails)
-
-entry_headings_frame = Frame(window, borderwidth=2, relief='ridge')
-entry_headings_frame.pack()
-entry_frame = Frame(window, borderwidth=2, relief='ridge')
-entry_frame.pack(pady=10)
-
-button_frame = Frame(window, borderwidth=2, relief='ridge')
-button_frame.pack(pady=25)
-Update = Button(button_frame, text="Update", command=pass_entrytotable)
-Update.pack()
-
 menubar.add_cascade(label="Connect Database Engine", command=open_Connector)
+#---------------------------------------------
 #Choosing_Database()
-window.config(menu=menubar)
+window.config(menu=menubar, bg='#373738')
 window.mainloop()
 
 
