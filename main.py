@@ -79,10 +79,11 @@ def create_table_list():
         i = i + 1
 
 def check_Table(num):
-    global selected_table, search_tbl, table
+    global selected_table, search_tbl, table, persistdata
+    persistdata = num
     #menubar.add_cascade(label="Choose Table", command=create_table_list)
     for tables in list_of_Tables:
-        if num == tables:
+        if persistdata == tables:
             table = tables
             print(table)
             selected_table = engine.execute(f"""SELECT * FROM {table}""")   # selects and executes the table
@@ -117,7 +118,8 @@ def Data_Table():
         data_ind += 1
 
 def singleData_Table():
-    id_details = search_tbl.get()
+    id_details = search_tbl.get() # bug where once a search is clicked, have to refresh the table data to be able to search again
+    check_Table(persistdata)
     #print(id_details)
     try:
         for records in tree.get_children():
@@ -307,8 +309,12 @@ def showappinfo():
     button_frame.pack(pady=25)
     Update = Button(button_frame, text="Update",font=("Arial", 10, "bold"), fg='white', command=pass_entrytotable, bg="#676769")
     Update.pack(side="left", padx=25)
-    Insert_btn = Button(button_frame, text="Insert",font=("Arial", 10, "bold"), fg='white', command=insertdata,bg="#676769")
+    Insert_btn = Button(button_frame, text="Insert",font=("Arial", 10, "bold"), fg='white', command=insertdata, bg="#676769")
     Insert_btn.pack(side="left", padx=25)
+    Clear_btn = Button(button_frame, text="Clear Entries", font=("Arial", 10, "bold"), fg='white', command=clearDataEntry, bg="#676769")
+    Clear_btn.pack(side="left", padx=25)
+    refresh_btn = Button(button_frame, text="Refresh Table", font=("Arial", 10, "bold"), fg='white', command=lambda: check_Table(persistdata), bg="#676769")
+    refresh_btn.pack(side="left", padx=25)
 
 lbl = Label(window, text="MUST CONNECT TO DATABASE", font=("Arial", 30, "bold"), fg='white', bg='#373738')
 lbl.pack(expand=TRUE, pady=20)
