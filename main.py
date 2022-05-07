@@ -118,7 +118,7 @@ def Data_Table():
         data_ind += 1
 
 def singleData_Table():
-    id_details = search_tbl.get() # bug where once a search is clicked, have to refresh the table data to be able to search again
+    id_details = search_tbl.get() 
     check_Table(persistdata)
     #print(id_details)
     try:
