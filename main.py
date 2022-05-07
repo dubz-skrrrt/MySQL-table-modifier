@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 import tkinter as tk
 from tkinter import *
-from tkinter.messagebox import showinfo
+from tkinter import filedialog
 from tkinter import ttk, messagebox
 import pandas as pd
 import xlrd
@@ -15,12 +15,16 @@ list_of_Tables =[]
 list_of_entry_lbl = []
 list_of_entry_widgets = []
 list_of_data = []
+# list_combo = []
+
+dataframe = pd.DataFrame({"active":["1", "0"]})
 def getInput():
     inp_db = input_db.get()
     return inp_db
 
 def Choosing_Database():
     # code
+    # Must have mysql workbench and server to be able to connect
     global engine, user, password, host, port, database, r_set
     user = 'root'
     password = 'qwerty1234'
@@ -81,6 +85,10 @@ def create_table_list():
 def check_Table(num):
     global selected_table, search_tbl, table, persistdata
     persistdata = num
+
+    # if len(list_combo) > 0:
+    #     del list_combo[:]
+    #     combo.destroy()
     #menubar.add_cascade(label="Choose Table", command=create_table_list)
     for tables in list_of_Tables:
         if persistdata == tables:
@@ -97,7 +105,7 @@ def Data_Table():
     tree["columns"] = headers
     tree["show"] = 'headings'
     ind = 0
-
+    # showFilterButton()
     delete_Table()
     clear_entry(list_of_entry_widgets)
     clear_entry(list_of_entry_lbl)
@@ -117,8 +125,20 @@ def Data_Table():
                     values=data[0:len(data)])       # Pass the data from mySQL table to the treeview table
         data_ind += 1
 
+def file_save():
+
+    try:
+        df = pd.read_sql(f'select * from {table}', engine)
+        print(df)
+        file = tk.filedialog.asksaveasfile(mode="w", defaultextension=".xlsx")
+        file.close()
+        df.to_excel(file.name, index=False)
+        messagebox.showinfo("Saved", f"File has been saved in: {file.name}")
+    except AttributeError as e:
+        messagebox.showerror("File not saved", f"File has not been saved due to: {e}")
+
 def singleData_Table():
-    id_details = search_tbl.get() 
+    id_details = search_tbl.get()
     check_Table(persistdata)
     #print(id_details)
     try:
@@ -179,6 +199,11 @@ def selectDetails(items):
         passdata.insert(0, list_of_data[i])
         i+=1
 
+# def select_active(event=None):
+#     tree.delete(*tree.get_children())
+#     for index, row in dataframe.loc[dataframe["active"].eq(combo.get())].iterrows():
+#         tree.insert("", END, text=index, values=list(row))
+
 def entries():
     global input
 
@@ -223,8 +248,8 @@ def updatedatabase(id):
 
         set_string = ", ".join(items)
         print(set_string)
-
-        updatequery = f"""UPDATE {table} SET {set_string} WHERE {headers[0]} = {id}""" # Finds the row of the selected table and updates it based on the set variable
+        # Finds the row of the selected table and updates it based on the set variable where primary id is located
+        updatequery = f"""UPDATE {table} SET {set_string} WHERE {headers[0]} = {id}"""
         engine.execute(updatequery)
         messagebox.showinfo('UPDATED', f'Your {table} has been Updated in {id}. \n Values: {set_string}')
     except SQLAlchemyError as e:
@@ -285,7 +310,8 @@ def showappinfo():
     search_tbl.pack(side="left", padx=25)
     search_btn = Button(search_frame, text="Search ID",font=("Arial", 10, "bold"), fg='white', command=singleData_Table, bg="#676769")
     search_btn.pack(side='right')
-
+    refresh_btn = Button(search_frame, text="Refresh Table", font=("Arial", 10, "bold"), fg='white', command=lambda: check_Table(persistdata), bg="#676769")
+    refresh_btn.pack(side="left", padx=25)
     data_table_frame = Frame(window, width=50, bg="#676769")
     data_table_frame.pack()
 
@@ -300,7 +326,7 @@ def showappinfo():
     tree.bind('<ButtonRelease-1>', selectDetails)
     lbl3 = Label(window, text=" ", bg="#373738")
     lbl3.pack(pady=10)
-    entry_headings_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
+    entry_headings_frame = Frame(window, borderwidth=2, bg="#676769")
     entry_headings_frame.pack()
     entry_frame = Frame(window, borderwidth=2, relief='ridge', bg="#676769")
     entry_frame.pack(pady=10)
@@ -313,8 +339,17 @@ def showappinfo():
     Insert_btn.pack(side="left", padx=25)
     Clear_btn = Button(button_frame, text="Clear Entries", font=("Arial", 10, "bold"), fg='white', command=clearDataEntry, bg="#676769")
     Clear_btn.pack(side="left", padx=25)
-    refresh_btn = Button(button_frame, text="Refresh Table", font=("Arial", 10, "bold"), fg='white', command=lambda: check_Table(persistdata), bg="#676769")
-    refresh_btn.pack(side="left", padx=25)
+    export_btn = Button(button_frame, text="Export as excel", font=("Arial", 10, "bold"), fg='white', command=file_save, bg="#676769")
+    export_btn.pack(side="left", padx=25)
+
+# def showFilterButton():
+#     global combo
+#     combo = ttk.Combobox(search_frame, values=dataframe, state='readonly')
+#     combo.pack()
+#     list_combo.append(combo)
+#
+#     combo.bind("<<ComboboxSelected>>", select_active)
+#     print(list_combo)
 
 lbl = Label(window, text="MUST CONNECT TO DATABASE", font=("Arial", 30, "bold"), fg='white', bg='#373738')
 lbl.pack(expand=TRUE, pady=20)
